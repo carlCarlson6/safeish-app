@@ -3,7 +3,7 @@ import { GetSafebox } from "../../Safebox";
 import { basicAuthValidator } from "../../auth/basicAuthValidator";
 import { UpsertItems } from "./UpsertItems";
 import {AES} from "crypto-js";
-import { env } from "@/common/env";
+import { env } from "@/env";
 
 const addItemsCommandSchema = z.object({
   safebox: z.object({

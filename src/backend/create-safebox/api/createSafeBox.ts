@@ -1,3 +1,5 @@
+"use server"
+
 import { checkSafeBoxNameIsUniqueOnCosmos } from "../CheckSafeboxNameUnique";
 import { storeNewSafeboxOnCosmos } from "../StoreNewSafebox";
 import { handler } from "../handler";

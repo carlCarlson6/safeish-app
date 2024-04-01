@@ -1,4 +1,4 @@
-import { env } from "@/common/env";
+import { env } from "@/env";
 import { CosmosClient, } from "@azure/cosmos";
 
 const {cosmos: {endpoint, key, safeishDbName, safeboxContainerName}} = env;

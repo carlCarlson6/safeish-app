@@ -3,7 +3,7 @@ import { basicAuthValidator } from "@/backend/auth/basicAuthValidator";
 import { z } from "zod";
 import { ReadItems } from "./ReadItems";
 import { AES, enc } from "crypto-js";
-import { env } from "@/common/env";
+import { env } from "@/env";
 
 const retrieveItemsQuerySchema = z.object({
   safeboxData: z.object({
