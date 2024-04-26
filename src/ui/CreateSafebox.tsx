@@ -1,6 +1,6 @@
 "use client"
 
-import { createSafeBox } from "@/backend/create-safebox/api/createSafeBox";
+import { createSafeBox } from "@/backend/create-safebox/api/createSafeBoxEndpoint";
 import { Box, Button, TextField } from "@radix-ui/themes";
 import { useState } from "react";
 
