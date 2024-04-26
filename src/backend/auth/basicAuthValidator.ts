@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GetSafebox, Safebox } from "../Safebox";
+import { GetSafebox } from "../Safebox";
 import { compare } from "bcrypt";
 
 const validateSafeboxAuthSchema = z.object({
@@ -24,7 +24,7 @@ export const basicAuthValidator = async (get: GetSafebox, inputData: z.infer<typ
   return credentialsValidation ? "auth_succeed" : "invalid_credentials";
 }
 
-const validateCredentials = async (
+export const validateCredentials = async (
   inputCredentials:  {name: string, password: string}, 
   storedCredentials: {name: string, hashedPassword: string}
 ) => {

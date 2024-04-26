@@ -24,11 +24,9 @@ export const handler = ({
   query: z.infer<typeof retrieveItemsQuerySchema>
 ) => {
   const parsedResult = await retrieveItemsQuerySchema.safeParseAsync(query);
-
   if (!parsedResult.success) {
     return "malformed-data" as const;
   }
-
   const { safeboxData } = parsedResult.data;
   
   const authResult = await basicAuthValidator(getSafebox, safeboxData);
