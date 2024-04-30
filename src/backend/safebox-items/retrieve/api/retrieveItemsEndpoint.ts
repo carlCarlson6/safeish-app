@@ -1,7 +1,6 @@
 import { getSafeboxFromCosmos } from "@/backend/Safebox";
 import { handler } from "../handler";
 import { readItemsFromCosmos } from "../ReadItems";
-import { NextRequest } from "next/server";
 import { invalidBasicAuthResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
 import { extractJwtFromHeader } from "@/backend/auth/jwt-token";
@@ -19,8 +18,7 @@ const formatResponse = (result: Awaited<ReturnType<typeof retrieveItems>>) => ma
   .with({type: "retrieved-tiems"}, ({items}) => Response.json({items}, {status: 200}))
   .exhaustive();
 
-// TODO - check if this works with Request instead NextRequest
-export const retrieveItemsEndpoint = (request: NextRequest, params: { id: string }) => retrieveItems({
+export const retrieveItemsEndpoint = (request: Request, params: { id: string }) => retrieveItems({
     safeboxId: params.id,
     token: extractJwtFromHeader(request),
   })

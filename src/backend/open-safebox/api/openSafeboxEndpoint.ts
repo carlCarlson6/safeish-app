@@ -2,7 +2,6 @@
 
 import { getSafeboxFromCosmos } from "@/backend/Safebox";
 import { handler } from "../handler";
-import { NextRequest } from "next/server";
 import { readBasicAuthHeader } from "@/backend/auth/readBasicAuthHeader";
 import { invalidBasicAuthResponse, lockedSafeboxErrorResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
@@ -22,8 +21,7 @@ const formatResponse = (result: Awaited<ReturnType<typeof openSafeBox>>) => matc
   .with({type: "opened"},      ({token}) => Response.json({token}, {status: 200}))
   .exhaustive();
 
-// TODO - check if this works with Request instead NextRequest
-export const openSafeBoxEndpoint = async (request: NextRequest, params: { id: string }) => {
+export const openSafeBoxEndpoint = async (request: Request, params: { id: string }) => {
   try {
     const result = await openSafeBox({
       safeboxData: {

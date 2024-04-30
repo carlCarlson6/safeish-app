@@ -1,7 +1,6 @@
 import { getSafeboxFromCosmos } from "@/backend/Safebox";
 import { handler } from "../handler";
 import { upsertItemsOnCosmos } from "../UpsertItems";
-import { NextRequest } from "next/server";
 import { invalidBasicAuthResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
 import { extractJwtFromHeader } from "@/backend/auth/jwt-token";
@@ -19,8 +18,7 @@ const formatResponse = (result: Awaited<ReturnType<typeof addSafeboxItems>>) => 
   .with({type: "stored-items"}, ({items}) => Response.json({items}, {status: 200}))
   .exhaustive();
 
-// TODO - check if this works with Request instead NextRequest
-export const addSafeboxItemsEndpoint = (request: NextRequest, params: {id: string}) => request
+export const addSafeboxItemsEndpoint = (request: Request, params: {id: string}) => request
   .json()
   .then(body => addSafeboxItems({
     safeboxId: params.id,
