@@ -21,28 +21,33 @@ export const handler = ({
 }: Dependencies) => async (
   command: z.infer<typeof addItemsCommandSchema>
 ) => {
-  const parsedResult = await addItemsCommandSchema.safeParseAsync(command);
-  if (!parsedResult.success) {
-    return "malformed-data" as const;
-  }
-  const { safeboxId, items, token } = parsedResult.data;
-
-  const isValidToken = await validateToken(token);
-  if (!isValidToken) {
-    return "invalid_credentials" as const;
-  }
-
-  const safebox = await getSafebox(parsedResult.data.token);
-  if (!safebox) {
-    return "safebox_not_found" as const;
-  }
+  try {
+    const parsedResult = await addItemsCommandSchema.safeParseAsync(command);
+    if (!parsedResult.success) {
+      return "malformed-data" as const;
+    }
+    const { safeboxId, items, token } = parsedResult.data;
   
-  await upsertItems({
-    safeboxId,
-    encryptedItems: encryptItems(items)
-  });
-
-  return { type: "stored-items" as const, items };
+    const isValidToken = await validateToken(token);
+    if (!isValidToken) {
+      return "invalid_credentials" as const;
+    }
+  
+    const safebox = await getSafebox(parsedResult.data.token);
+    if (!safebox) {
+      return "safebox_not_found" as const;
+    }
+    
+    await upsertItems({
+      safeboxId,
+      encryptedItems: encryptItems(items)
+    });
+  
+    return { type: "stored-items" as const, items };
+  } catch (error) {
+    console.error(error);
+    return "unknown-error" as const;
+  }
 }
 
 const encryptItems = (items: string[]) => items.map(item => 

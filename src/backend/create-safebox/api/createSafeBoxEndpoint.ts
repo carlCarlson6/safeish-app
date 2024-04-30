@@ -13,9 +13,10 @@ const createSafeBox = handler({
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof createSafeBox>>) => match(result)
-  .with({type: "created"}, ({id}) => createdResponse(id))
   .with("already-exists",  ()     => alreadyExistsResponse)
   .with("malformed-data",  ()     => malformedDataResponse)
+  .with("unknown-error",   ()     => unknownErrorResponse)
+  .with({type: "created"}, ({id}) => createdResponse(id))
   .exhaustive();
 
 const createdResponse = (safeboxId: UUID) => Response.json({ 

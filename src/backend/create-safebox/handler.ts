@@ -18,21 +18,26 @@ export const handler = ({
   checkSafeboxNameUnique, 
   storeNewSafebox,
 }: HandlerDependencies) => async (command: z.infer<typeof createSafeboxCommandSchema>) => {
-  const parseResult = await createSafeboxCommandSchema.safeParseAsync(command);
-  if(!parseResult.success) {
-    return "malformed-data" as const;
-  }
-
-  const {name, password} = parseResult.data;
+  try {
+    const parseResult = await createSafeboxCommandSchema.safeParseAsync(command);
+    if(!parseResult.success) {
+      return "malformed-data" as const;
+    }
   
-  const isSafebaxNameUnique = await checkSafeboxNameUnique(name);
-  if (!isSafebaxNameUnique) {
-    return "already-exists" as const;
+    const {name, password} = parseResult.data;
+    
+    const isSafebaxNameUnique = await checkSafeboxNameUnique(name);
+    if (!isSafebaxNameUnique) {
+      return "already-exists" as const;
+    }
+  
+    const safeboxId = randomUUID();
+    const hashedPassword = await hashPassword(password);
+    await storeNewSafebox({id: safeboxId, name, hashedPassword, unlocksFailureTries: 0});
+    return { type: "created" as const, id: safeboxId };
+  } catch (error) {
+    console.error("unknown error", error);
+    return "unknown-error" as const; 
   }
-
-  const safeboxId = randomUUID();
-  const hashedPassword = await hashPassword(password);
-  await storeNewSafebox({id: safeboxId, name, hashedPassword});
-  return { type: "created" as const, id: safeboxId };
 }
 

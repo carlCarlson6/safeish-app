@@ -1,19 +1,24 @@
+"use server"
+
 import { getSafeboxFromCosmos } from "@/backend/Safebox";
 import { handler } from "../handler";
 import { NextRequest } from "next/server";
 import { readBasicAuthHeader } from "@/backend/auth/readBasicAuthHeader";
 import { invalidBasicAuthResponse, lockedSafeboxErrorResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
+import { updateSafeboxOnCosmos } from "../UpdateSafebox";
 
 const openSafeBox = handler({
   get: getSafeboxFromCosmos,
+  update: updateSafeboxOnCosmos,
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof openSafeBox>>) => match(result)
-  .with("invalid-credentials", () => invalidBasicAuthResponse)
-  .with("not-found",           () => safeboxNotFoundResponse)
-  .with("malformed-data",      () => malformedDataResponse)
-  .with("locked",              () => lockedSafeboxErrorResponse)
+  .with("invalid-credentials", ()        => invalidBasicAuthResponse)
+  .with("not-found",           ()        => safeboxNotFoundResponse)
+  .with("malformed-data",      ()        => malformedDataResponse)
+  .with("locked",              ()        => lockedSafeboxErrorResponse)
+  .with("unknown-error",       ()        => unknownErrorResponse)
   .with({type: "opened"},      ({token}) => Response.json({token}, {status: 200}))
   .exhaustive();
 

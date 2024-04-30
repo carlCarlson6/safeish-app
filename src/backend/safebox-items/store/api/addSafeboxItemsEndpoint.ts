@@ -15,6 +15,7 @@ const formatResponse = (result: Awaited<ReturnType<typeof addSafeboxItems>>) => 
   .with("invalid_credentials",  ()        => invalidBasicAuthResponse)
   .with("malformed-data",       ()        => malformedDataResponse)
   .with("safebox_not_found",    ()        => safeboxNotFoundResponse)
+  .with("unknown-error",        ()        => unknownErrorResponse)
   .with({type: "stored-items"}, ({items}) => Response.json({items}, {status: 200}))
   .exhaustive();
 

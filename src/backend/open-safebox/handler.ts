@@ -2,7 +2,7 @@ import { z } from "zod";
 import { GetSafebox, Safebox } from "../Safebox";
 import { validateCredentials } from "../auth/basicAuthValidator";
 import { generateToken } from "../auth/jwt-token";
-import { UpdateSafebox } from "./update-safebox";
+import { UpdateSafebox } from "./UpdateSafebox";
 
 const MAX_NUMBER_OPEN_TRIES = 3;
 
@@ -24,24 +24,29 @@ export const handler = ({
 }: Dependencies) => async (
   command: z.infer<typeof openSafeboxCommandSchema>
 ) => {
-  const parsedResult = await openSafeboxCommandSchema.safeParseAsync(command);
-  if (!parsedResult.success) {
-    return "malformed-data" as const;
-  }
-  const { safeboxData } = parsedResult.data;
+  try {
+    const parsedResult = await openSafeboxCommandSchema.safeParseAsync(command);
+    if (!parsedResult.success) {
+      return "malformed-data" as const;
+    }
+    const { safeboxData } = parsedResult.data;
+    
+    const safebox = await get(safeboxData.id);
+    if (!safebox) {
+      return "not-found" as const;
+    }
+    if (safebox.unlocksFailureTries >= MAX_NUMBER_OPEN_TRIES) {
+      return "locked" as const;
+    }
   
-  const safebox = await get(safeboxData.id);
-  if (!safebox) {
-    return "not-found" as const;
+    const areValid = await validateCredentials(safeboxData, safebox);
+    return areValid
+      ? handleValidCredentials(safebox.id)
+      : handleInvalidCredentials(safebox, update);
+  } catch (error) {
+    console.error("unknown-error",error)
+    return "unknown-error" as const; 
   }
-  if (safebox.unlocksFailureTries >= MAX_NUMBER_OPEN_TRIES) {
-    return "locked" as const;
-  }
-
-  const areValid = await validateCredentials(safeboxData, safebox);
-  return areValid
-    ? handleValidCredentials(safebox.id)
-    : handleInvalidCredentials(safebox, update);
 }
 
 const handleValidCredentials = (safeBoxId: string) => ({

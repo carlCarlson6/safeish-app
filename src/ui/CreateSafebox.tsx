@@ -1,6 +1,6 @@
 "use client"
 
-import { createSafeBox } from "@/backend/create-safebox/api/createSafeBoxEndpoint";
+
 import { Box, Button, TextField } from "@radix-ui/themes";
 import { useState } from "react";
 
@@ -37,7 +37,7 @@ const useCreateSafebox = () => {
     isRunning,
     execute: (name: string, password: string) => {
       setIsRunning(true);
-      createSafeBox({name, password});
+      
     }
   }
 }

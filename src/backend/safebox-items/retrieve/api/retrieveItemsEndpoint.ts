@@ -15,6 +15,7 @@ const formatResponse = (result: Awaited<ReturnType<typeof retrieveItems>>) => ma
   .with("invalid_credentials",     ()        => invalidBasicAuthResponse)
   .with("safebox_not_found",       ()        => safeboxNotFoundResponse)
   .with("malformed-data",          ()        => malformedDataResponse)
+  .with("unknown-error",           ()        => unknownErrorResponse)
   .with({type: "retrieved-tiems"}, ({items}) => Response.json({items}, {status: 200}))
   .exhaustive();
 

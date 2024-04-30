@@ -20,27 +20,32 @@ export const handler = ({
 }: Dependencies) => async (
   query: z.infer<typeof retrieveItemsQuerySchema>
 ) => {
-  const parsedResult = await retrieveItemsQuerySchema.safeParseAsync(query);
-  if (!parsedResult.success) {
-    return "malformed-data" as const;
-  }
+  try {
+    const parsedResult = await retrieveItemsQuerySchema.safeParseAsync(query);
+    if (!parsedResult.success) {
+      return "malformed-data" as const;
+    }
+    
+    const isValidToken = await validateToken(parsedResult.data.token);
+    if (!isValidToken) {
+      return "invalid_credentials" as const;
+    }
   
-  const isValidToken = await validateToken(parsedResult.data.token);
-  if (!isValidToken) {
-    return "invalid_credentials" as const;
+    const safebox = await getSafebox(parsedResult.data.token);
+    if (!safebox) {
+      return "safebox_not_found" as const;
+    }
+  
+    const encryptedItems = await readItems(safebox.id);
+  
+    return { 
+      type: "retrieved-tiems" as const, 
+      items: decryptItems(encryptedItems) 
+    };
+  } catch (error) {
+    console.error("unknown-error", error);
+    return "unknown-error" as const;
   }
-
-  const safebox = await getSafebox(parsedResult.data.token);
-  if (!safebox) {
-    return "safebox_not_found" as const;
-  }
-
-  const encryptedItems = await readItems(safebox.id);
-
-  return { 
-    type: "retrieved-tiems" as const, 
-    items: decryptItems(encryptedItems) 
-  };
 }
 
 const decryptItems = (encryptedItems: string[]) => encryptedItems.map(encryptedItem => 

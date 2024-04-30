@@ -23,7 +23,7 @@ export const env = z.object({
   encryptionKey: process.env.ENCRYPTION_KEY,
   auth: {
     key:      process.env.AUTH_KEY,
-    issuer:   process.env.AUTH_ISSUER,
-    audience: process.env.AUTH_AUDIENCE
+    issuer:   process.env.APP_NAME,
+    audience: process.env.APP_NAME
   }
 })
