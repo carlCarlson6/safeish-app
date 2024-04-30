@@ -1,16 +1,13 @@
 import { GetSafebox } from "@/backend/Safebox";
-import { basicAuthValidator } from "@/backend/auth/basicAuthValidator";
 import { z } from "zod";
 import { ReadItems } from "./ReadItems";
 import { AES, enc } from "crypto-js";
 import { env } from "@/env";
+import { validateToken } from "@/backend/auth/jwt-token";
 
 const retrieveItemsQuerySchema = z.object({
-  safeboxData: z.object({
-    id: z.string().uuid(),
-    name: z.string().min(1),
-    password: z.string().min(1),
-  }),
+  safeboxId: z.string().uuid(),
+  token: z.string().min(1),
 });
 
 type Dependencies = {
@@ -27,14 +24,18 @@ export const handler = ({
   if (!parsedResult.success) {
     return "malformed-data" as const;
   }
-  const { safeboxData } = parsedResult.data;
   
-  const authResult = await basicAuthValidator(getSafebox, safeboxData);
-  if (authResult !== "auth_succeed") {
-    return authResult;
+  const isValidToken = await validateToken(parsedResult.data.token);
+  if (!isValidToken) {
+    return "invalid_credentials" as const;
   }
 
-  const encryptedItems = await readItems(safeboxData.id);
+  const safebox = await getSafebox(parsedResult.data.token);
+  if (!safebox) {
+    return "safebox_not_found" as const;
+  }
+
+  const encryptedItems = await readItems(safebox.id);
 
   return { 
     type: "retrieved-tiems" as const, 

@@ -1,17 +1,14 @@
 import { z } from "zod"
 import { GetSafebox } from "../../Safebox";
-import { basicAuthValidator } from "../../auth/basicAuthValidator";
 import { UpsertItems } from "./UpsertItems";
-import {AES} from "crypto-js";
+import { AES } from "crypto-js";
 import { env } from "@/env";
+import { validateToken } from "@/backend/auth/jwt-token";
 
 const addItemsCommandSchema = z.object({
-  safebox: z.object({
-    id: z.string().uuid(),
-    name: z.string().min(1),
-    password: z.string().min(1),
-  }),
-  items: z.array(z.string())
+  safeboxId: z.string().uuid(),
+  token: z.string().min(1),
+  items: z.array(z.string()),
 });
 
 type Dependencies = {
@@ -25,20 +22,23 @@ export const handler = ({
   command: z.infer<typeof addItemsCommandSchema>
 ) => {
   const parsedResult = await addItemsCommandSchema.safeParseAsync(command);
-
   if (!parsedResult.success) {
     return "malformed-data" as const;
   }
+  const { safeboxId, items, token } = parsedResult.data;
 
-  const { safebox, items } = parsedResult.data;
-  
-  const authResult = await basicAuthValidator(getSafebox, safebox);
-  if (authResult !== "auth_succeed") {
-    return authResult;
+  const isValidToken = await validateToken(token);
+  if (!isValidToken) {
+    return "invalid_credentials" as const;
   }
 
+  const safebox = await getSafebox(parsedResult.data.token);
+  if (!safebox) {
+    return "safebox_not_found" as const;
+  }
+  
   await upsertItems({
-    safeboxId: safebox.id.replace("safebox__", ""), 
+    safeboxId,
     encryptedItems: encryptItems(items)
   });
 

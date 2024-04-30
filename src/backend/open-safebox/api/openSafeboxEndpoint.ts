@@ -6,7 +6,7 @@ import { invalidBasicAuthResponse, lockedSafeboxErrorResponse, malformedDataResp
 import { match } from "ts-pattern";
 
 const openSafeBox = handler({
-  getSafebox: getSafeboxFromCosmos,
+  get: getSafeboxFromCosmos,
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof openSafeBox>>) => match(result)

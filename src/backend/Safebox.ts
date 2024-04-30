@@ -10,8 +10,7 @@ export type Safebox = {
 export type GetSafebox = (id: string) => Promise<Safebox|null>;
 
 export const getSafeboxFromCosmos = async (id: string) => {
-  const safeboxContainer = getSafeboxContainer();
-  const result = await safeboxContainer.item(`safebox__${id}`, "safebox").read<Safebox>();
+  const result = await getSafeboxContainer().item(`safebox__${id}`, "safebox").read<Safebox>();
   return !result.resource  
     ? null
     : { 

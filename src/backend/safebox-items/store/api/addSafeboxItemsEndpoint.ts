@@ -13,7 +13,6 @@ const addSafeboxItems = handler({
 
 const formatResponse = (result: Awaited<ReturnType<typeof addSafeboxItems>>) => match(result)
   .with("invalid_credentials",  ()        => invalidBasicAuthResponse)
-  .with("invalid_input_data",   ()        => malformedDataResponse)
   .with("malformed-data",       ()        => malformedDataResponse)
   .with("safebox_not_found",    ()        => safeboxNotFoundResponse)
   .with({type: "stored-items"}, ({items}) => Response.json({items}, {status: 200}))
@@ -25,7 +24,7 @@ export const addSafeboxItemsEndpoint = (request: NextRequest, params: {id: strin
   .then(body => addSafeboxItems({
     safebox: {
       id: params.id,
-      ...readBasicAuthHeader(request),
+      ...readBasicAuthHeader(request), // TODO - read data from bearer token
     },
     ...body
   }))

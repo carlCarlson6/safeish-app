@@ -8,6 +8,11 @@ export const env = z.object({
     safeboxContainerName: z.string().min(1),
   }),
   encryptionKey: z.string().min(1),
+  auth: z.object({
+    key:      z.string().min(1),
+    issuer:   z.string().min(1),
+    audience: z.string().min(1)
+  })
 }).parse({
   cosmos: {
     endpoint:             process.env.COSMOS_ENDPOINT,
@@ -16,4 +21,9 @@ export const env = z.object({
     safeboxContainerName: process.env.COSMOS_SAFEBOX_CONTAINER,
   },
   encryptionKey: process.env.ENCRYPTION_KEY,
+  auth: {
+    key:      process.env.AUTH_KEY,
+    issuer:   process.env.AUTH_ISSUER,
+    audience: process.env.AUTH_AUDIENCE
+  }
 })

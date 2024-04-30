@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { GetSafebox, Safebox } from "../Safebox";
 import { validateCredentials } from "../auth/basicAuthValidator";
+import { generateToken } from "../auth/jwt-token";
+import { UpdateSafebox } from "./update-safebox";
+
+const MAX_NUMBER_OPEN_TRIES = 3;
 
 const openSafeboxCommandSchema = z.object({
   safeboxData: z.object({
@@ -8,14 +12,15 @@ const openSafeboxCommandSchema = z.object({
     name: z.string().min(1),
     password: z.string().min(1),
   }),
-})
+});
 
 type Dependencies = {
-  getSafebox: GetSafebox
-};
+  get:    GetSafebox,
+  update: UpdateSafebox
+}
 
 export const handler = ({
-  getSafebox
+  get, update
 }: Dependencies) => async (
   command: z.infer<typeof openSafeboxCommandSchema>
 ) => {
@@ -25,32 +30,30 @@ export const handler = ({
   }
   const { safeboxData } = parsedResult.data;
   
-  const safebox = await getSafebox(safeboxData.id);
+  const safebox = await get(safeboxData.id);
   if (!safebox) {
     return "not-found" as const;
   }
-  if (safebox.unlocksFailureTries >= 3) {
+  if (safebox.unlocksFailureTries >= MAX_NUMBER_OPEN_TRIES) {
     return "locked" as const;
   }
 
   const areValid = await validateCredentials(safeboxData, safebox);
   return areValid
     ? handleValidCredentials(safebox.id)
-    : handleInvalidCredentials(safebox);
+    : handleInvalidCredentials(safebox, update);
 }
 
-const handleValidCredentials = (safeBoxId: string) => {
-  return {
-    type: "opened" as const,
-    token: "some-token" // TODO - generate token
-  }
-}
+const handleValidCredentials = (safeBoxId: string) => ({
+  type: "opened" as const,
+  token: generateToken(safeBoxId),
+})
 
-const handleInvalidCredentials = (safebox: Safebox) => {
+const handleInvalidCredentials = async (safebox: Safebox, updateSafebox: UpdateSafebox) => {
   const safeboxUpdateUnlockTries = { ...safebox, unlocksFailureTries: safebox.unlocksFailureTries+1 };
-  // TODO - update safebox on db
+  await updateSafebox(safeboxUpdateUnlockTries);
 
-  return safebox.unlocksFailureTries >= 3 
+  return safebox.unlocksFailureTries >= MAX_NUMBER_OPEN_TRIES 
     ? "locked" as const
     : "invalid-credentials" as const;
 }
