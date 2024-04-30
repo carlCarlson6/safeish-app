@@ -23,12 +23,17 @@ const formatResponse = (result: Awaited<ReturnType<typeof openSafeBox>>) => matc
   .exhaustive();
 
 // TODO - check if this works with Request instead NextRequest
-export const openSafeBoxEndpoint = (request: NextRequest, params: { id: string }) => openSafeBox({safeboxData: {
-    id: params.id,
-    ...readBasicAuthHeader(request),
-  }})
-  .then(formatResponse)
-  .catch(error => {
+export const openSafeBoxEndpoint = async (request: NextRequest, params: { id: string }) => {
+  try {
+    const result = await openSafeBox({
+      safeboxData: {
+        id: params.id,
+        ...readBasicAuthHeader(request),
+      }
+    });
+    return formatResponse(result);
+  } catch (error) {
     console.error(error);
     return unknownErrorResponse;
-  });
+  }
+};

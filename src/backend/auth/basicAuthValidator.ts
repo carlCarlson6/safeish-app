@@ -11,6 +11,7 @@ const validateSafeboxAuthSchema = z.object({
 export const basicAuthValidator = async (get: GetSafebox, inputData: z.infer<typeof validateSafeboxAuthSchema>) => {
   const parseResult = await validateSafeboxAuthSchema.safeParseAsync(inputData);
   if (!parseResult.success) {
+    console.log("basicAuthValidator - invalid_input_data")
     return "invalid_input_data" as const;
   }
   const {id, name, password} = parseResult.data;

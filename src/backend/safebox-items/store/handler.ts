@@ -21,6 +21,7 @@ export const handler = ({
 }: Dependencies) => async (
   command: z.infer<typeof addItemsCommandSchema>
 ) => {
+  console.log("updating-safebox-items");
   try {
     const parsedResult = await addItemsCommandSchema.safeParseAsync(command);
     if (!parsedResult.success) {
@@ -29,11 +30,12 @@ export const handler = ({
     const { safeboxId, items, token } = parsedResult.data;
   
     const isValidToken = await validateToken(token);
+    console.log(isValidToken);
     if (!isValidToken) {
       return "invalid_credentials" as const;
     }
   
-    const safebox = await getSafebox(parsedResult.data.token);
+    const safebox = await getSafebox(safeboxId);
     if (!safebox) {
       return "safebox_not_found" as const;
     }

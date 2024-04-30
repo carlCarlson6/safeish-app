@@ -20,6 +20,7 @@ export const handler = ({
 }: Dependencies) => async (
   query: z.infer<typeof retrieveItemsQuerySchema>
 ) => {
+  console.log("list safebox items")
   try {
     const parsedResult = await retrieveItemsQuerySchema.safeParseAsync(query);
     if (!parsedResult.success) {
@@ -31,7 +32,7 @@ export const handler = ({
       return "invalid_credentials" as const;
     }
   
-    const safebox = await getSafebox(parsedResult.data.token);
+    const safebox = await getSafebox(parsedResult.data.safeboxId);
     if (!safebox) {
       return "safebox_not_found" as const;
     }

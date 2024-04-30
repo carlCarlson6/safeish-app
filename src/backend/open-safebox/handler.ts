@@ -25,6 +25,7 @@ export const handler = ({
   command: z.infer<typeof openSafeboxCommandSchema>
 ) => {
   try {
+    console.log("opening-safe-box");
     const parsedResult = await openSafeboxCommandSchema.safeParseAsync(command);
     if (!parsedResult.success) {
       return "malformed-data" as const;
@@ -41,7 +42,7 @@ export const handler = ({
   
     const areValid = await validateCredentials(safeboxData, safebox);
     return areValid
-      ? handleValidCredentials(safebox.id)
+      ? await handleValidCredentials(safebox.id)
       : handleInvalidCredentials(safebox, update);
   } catch (error) {
     console.error("unknown-error",error)
@@ -49,9 +50,9 @@ export const handler = ({
   }
 }
 
-const handleValidCredentials = (safeBoxId: string) => ({
+const handleValidCredentials = async (safeBoxId: string) => ({
   type: "opened" as const,
-  token: generateToken(safeBoxId),
+  token: await generateToken(safeBoxId),
 })
 
 const handleInvalidCredentials = async (safebox: Safebox, updateSafebox: UpdateSafebox) => {

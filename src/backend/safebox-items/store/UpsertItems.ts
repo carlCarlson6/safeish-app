@@ -7,6 +7,7 @@ export const upsertItemsOnCosmos = async (data: {safeboxId: string, encryptedIte
   const result = await container.item(`items__${data.safeboxId}`, "items").read<{}>();
   if (!result.resource) {
     await container.items.create({
+      id: `items__${data.safeboxId}`,
       encryptedItems: data.encryptedItems,
       collection: "items"
     })

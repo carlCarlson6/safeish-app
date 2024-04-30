@@ -2,9 +2,9 @@ import { getSafeboxFromCosmos } from "@/backend/Safebox";
 import { handler } from "../handler";
 import { upsertItemsOnCosmos } from "../UpsertItems";
 import { NextRequest } from "next/server";
-import { readBasicAuthHeader } from "@/backend/auth/readBasicAuthHeader";
 import { invalidBasicAuthResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
+import { extractJwtFromHeader } from "@/backend/auth/jwt-token";
 
 const addSafeboxItems = handler({
   getSafebox: getSafeboxFromCosmos,
@@ -23,11 +23,9 @@ const formatResponse = (result: Awaited<ReturnType<typeof addSafeboxItems>>) => 
 export const addSafeboxItemsEndpoint = (request: NextRequest, params: {id: string}) => request
   .json()
   .then(body => addSafeboxItems({
-    safebox: {
-      id: params.id,
-      ...readBasicAuthHeader(request), // TODO - read data from bearer token
-    },
-    ...body
+    safeboxId: params.id,
+    token: extractJwtFromHeader(request),
+    ...body,
   }))
   .then(formatResponse)
   .catch(error => {

@@ -5,9 +5,8 @@ export type StoreNewSafebox = (safeboxData: Safebox) => Promise<void>;
 
 export const storeNewSafeboxOnCosmos: StoreNewSafebox = (data) => getSafeboxContainer()
   .items.create({
+    ...data,
     id:             `safebox__${data.id}`,
-    name:           data.name,
-    hashedPassword: data.hashedPassword,
     collection:     "safebox",
   })
   .then(_ => { return; })
