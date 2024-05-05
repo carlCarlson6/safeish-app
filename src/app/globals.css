@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .with-border {
+    @apply rounded-md border-2 border-slate-400;
+  }
+}

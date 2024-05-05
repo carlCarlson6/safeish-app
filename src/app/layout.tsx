@@ -1,5 +1,4 @@
-import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
+import "./globals.css"
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -16,11 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-slate-800 text-slate-50	">
       <body className={inter.className}>
-        <Theme appearance='dark'>
-          {children}
-        </Theme>
+        {children}
       </body>
     </html>
   );
