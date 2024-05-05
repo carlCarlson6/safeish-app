@@ -6,10 +6,11 @@ import { readBasicAuthHeader } from "@/backend/auth/readBasicAuthHeader";
 import { invalidBasicAuthResponse, lockedSafeboxErrorResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
 import { updateSafeboxOnCosmos } from "../UpdateSafebox";
+import { env } from "@/env";
 
 const openSafeBox = handler({
-  get: getSafeboxFromCosmos,
-  update: updateSafeboxOnCosmos,
+  get: getSafeboxFromCosmos(env.cosmos),
+  update: updateSafeboxOnCosmos(env.cosmos),
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof openSafeBox>>) => match(result)

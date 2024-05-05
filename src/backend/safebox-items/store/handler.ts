@@ -14,10 +14,11 @@ const addItemsCommandSchema = z.object({
 type Dependencies = {
   getSafebox: GetSafebox,
   upsertItems: UpsertItems,
+  encryptionKey: string
 }
 
 export const handler = ({
-  getSafebox, upsertItems
+  getSafebox, upsertItems, encryptionKey
 }: Dependencies) => async (
   command: z.infer<typeof addItemsCommandSchema>
 ) => {
@@ -42,7 +43,7 @@ export const handler = ({
     
     await upsertItems({
       safeboxId,
-      encryptedItems: encryptItems(items)
+      encryptedItems: encryptItems(items, encryptionKey)
     });
   
     return { type: "stored-items" as const, items };
@@ -52,7 +53,7 @@ export const handler = ({
   }
 }
 
-const encryptItems = (items: string[]) => items.map(item => 
+const encryptItems = (items: string[], encryptionKey: string) => items.map(item => 
   AES.encrypt(item, env.encryptionKey).toString()
 );
 

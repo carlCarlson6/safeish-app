@@ -1,10 +1,10 @@
 import { Safebox } from "../Safebox";
-import { getSafeboxContainer } from "../infrastructure/azure-cosmos-db";
+import { CosmosConfig, getSafeboxContainer } from "../infrastructure/azure-cosmos-db";
 
 export type UpdateSafebox = (safebox: Safebox) => Promise<void>;
 
-export const updateSafeboxOnCosmos = async (safebox: Safebox) => {
-  await getSafeboxContainer()
+export const updateSafeboxOnCosmos = (cosmos: CosmosConfig) => async (safebox: Safebox) => {
+  await getSafeboxContainer(cosmos)()
     .item(`safebox__${safebox.id}`, "safebox")
     .replace({
       ...safebox,

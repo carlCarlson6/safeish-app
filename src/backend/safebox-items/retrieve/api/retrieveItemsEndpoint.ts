@@ -4,10 +4,12 @@ import { readItemsFromCosmos } from "../ReadItems";
 import { invalidBasicAuthResponse, malformedDataResponse, safeboxNotFoundResponse, unknownErrorResponse } from "@/backend/infrastructure/api-errors";
 import { match } from "ts-pattern";
 import { extractJwtFromHeader } from "@/backend/auth/jwt-token";
+import { env } from "@/env";
 
 const retrieveItems = handler({
-  getSafebox: getSafeboxFromCosmos,
-  readItems:  readItemsFromCosmos,
+  getSafebox:     getSafeboxFromCosmos,
+  readItems:      readItemsFromCosmos,
+  encryptionKey:  env.encryptionKey,
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof retrieveItems>>) => match(result)

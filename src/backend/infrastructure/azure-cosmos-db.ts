@@ -1,9 +1,9 @@
 import { env } from "@/env";
 import { CosmosClient, } from "@azure/cosmos";
 
-const {cosmos: {endpoint, key, safeishDbName, safeboxContainerName}} = env;
+export type CosmosConfig = typeof env.cosmos;
 
-export const getSafeboxContainer = () => new CosmosClient({ 
+export const getSafeboxContainer = ({endpoint, key, safeishDbName, safeboxContainerName}: CosmosConfig) => () => new CosmosClient({ 
     endpoint: endpoint,
     key:      key
   })

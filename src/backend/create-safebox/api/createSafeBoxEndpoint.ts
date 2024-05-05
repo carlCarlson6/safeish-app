@@ -6,10 +6,11 @@ import { storeNewSafeboxOnCosmos } from "../StoreNewSafebox";
 import { handler } from "../handler";
 import { match } from "ts-pattern";
 import { UUID } from "crypto";
+import { env } from "@/env";
 
 const createSafeBox = handler({
-  checkSafeboxNameUnique: checkSafeBoxNameIsUniqueOnCosmos, 
-  storeNewSafebox:        storeNewSafeboxOnCosmos,
+  checkSafeboxNameUnique: checkSafeBoxNameIsUniqueOnCosmos(env.cosmos), 
+  storeNewSafebox:        storeNewSafeboxOnCosmos(env.cosmos),
 });
 
 const formatResponse = (result: Awaited<ReturnType<typeof createSafeBox>>) => match(result)

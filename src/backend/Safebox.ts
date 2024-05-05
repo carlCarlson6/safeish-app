@@ -1,4 +1,4 @@
-import { getSafeboxContainer } from "./infrastructure/azure-cosmos-db";
+import { CosmosConfig, getSafeboxContainer } from "./infrastructure/azure-cosmos-db";
 
 export type Safebox = {
   id: string; 
@@ -9,8 +9,8 @@ export type Safebox = {
 
 export type GetSafebox = (id: string) => Promise<Safebox|null>;
 
-export const getSafeboxFromCosmos = async (id: string) => {
-  const result = await getSafeboxContainer().item(`safebox__${id}`, "safebox").read<Safebox>();
+export const getSafeboxFromCosmos = (cosmmos: CosmosConfig) => async (id: string) => {
+  const result = await getSafeboxContainer(cosmmos)().item(`safebox__${id}`, "safebox").read<Safebox>();
   return !result.resource  
     ? null
     : { 

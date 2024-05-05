@@ -2,7 +2,6 @@ import { GetSafebox } from "@/backend/Safebox";
 import { z } from "zod";
 import { ReadItems } from "./ReadItems";
 import { AES, enc } from "crypto-js";
-import { env } from "@/env";
 import { validateToken } from "@/backend/auth/jwt-token";
 
 const retrieveItemsQuerySchema = z.object({
@@ -13,10 +12,11 @@ const retrieveItemsQuerySchema = z.object({
 type Dependencies = {
   getSafebox: GetSafebox,
   readItems:  ReadItems,
+  encryptionKey: string,
 }
 
 export const handler = ({
-  getSafebox, readItems
+  getSafebox, readItems, encryptionKey
 }: Dependencies) => async (
   query: z.infer<typeof retrieveItemsQuerySchema>
 ) => {
@@ -41,7 +41,7 @@ export const handler = ({
   
     return { 
       type: "retrieved-tiems" as const, 
-      items: decryptItems(encryptedItems) 
+      items: decryptItems(encryptedItems, encryptionKey) 
     };
   } catch (error) {
     console.error("unknown-error", error);
@@ -49,6 +49,6 @@ export const handler = ({
   }
 }
 
-const decryptItems = (encryptedItems: string[]) => encryptedItems.map(encryptedItem => 
-  AES.decrypt(encryptedItem, env.encryptionKey).toString(enc.Utf8)
+const decryptItems = (encryptedItems: string[], encryptionKey: string) => encryptedItems.map(encryptedItem => 
+  AES.decrypt(encryptedItem, encryptionKey).toString(enc.Utf8)
 );
