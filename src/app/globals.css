@@ -4,6 +4,20 @@
 
 @layer components {
   .with-border {
-    @apply rounded-md border-2 border-slate-400;
+    @apply 
+    rounded-lg 
+    border-2 
+    border-blue-400 p-3;
+  }
+
+  .input-data {
+    @apply 
+    bg-blue-800 p-0.5 pl-2 
+    text-blue-100 
+    rounded-md border-2 
+    border-blue-400 
+    focus:border-blue-200 
+    focus:outline-none 
+    focus:ring-0;
   }
 }

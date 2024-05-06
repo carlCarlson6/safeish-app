@@ -1,6 +1,6 @@
 export function OpenSafebox() {
   return (<>
-    <div className="with-boder">
+    <div className="with-border">
       open safebox form
     </div>
   </>);
